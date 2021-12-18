@@ -11,7 +11,6 @@ function getRemote($url){
 	  CURLOPT_URL => $url,
 	  CURLOPT_RETURNTRANSFER => true,
 	  CURLOPT_TIMEOUT => 30,
-	  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 	  CURLOPT_CUSTOMREQUEST => "GET",
 	  CURLOPT_HTTPHEADER => array(
 		"cache-control: no-cache"
@@ -38,7 +37,7 @@ $showForm=true;
 
 if(isset($_POST) && count($_POST)>0 && isset($_SESSION["token"]) && $_SESSION["token"]!='' && isset($_POST["bootstrapFollows"]) && $_POST["bootstrapFollows"]==$_SESSION["token"]){
 	$_SESSION["token"]='';
-	//10 plust bootstrapFollows
+	//$maxCats plus bootstrapFollows
 	if(count($_POST)<=$maxCats+1){
 		$list=file_get_contents('cache/list.json');
 		$list=json_decode($list, true);
@@ -46,6 +45,7 @@ if(isset($_POST) && count($_POST)>0 && isset($_SESSION["token"]) && $_SESSION["t
 			$_POST=array();
 		}
 		$str="Account address,Show boosts\n";
+		$ckeckArray=array();
 		foreach($_POST as $k=>$v){
 			if($k!="bootstrapFollows"){
 				
@@ -79,7 +79,8 @@ if(isset($_POST) && count($_POST)>0 && isset($_SESSION["token"]) && $_SESSION["t
 				$cat=json_decode($cat, true);
 				if($cat){
 					foreach($cat as $kk=>$vv){
-						if(isset($vv["acct"])){
+						if(isset($vv["acct"]) && !in_array($vv["acct"], $ckeckArray)){
+							$ckeckArray[]=$vv["acct"];
 							$str.=$vv["acct"].",true\n";
 						}
 					}
